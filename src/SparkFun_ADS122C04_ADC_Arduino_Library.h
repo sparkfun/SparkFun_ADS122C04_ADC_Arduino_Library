@@ -74,6 +74,9 @@
 #define ADS122C04_2WIRE_MODE         0x2
 #define ADS122C04_TEMPERATURE_MODE   0x3
 #define ADS122C04_RAW_MODE           0x4
+#define ADS122C04_4WIRE_HI_TEMP      0x5
+#define ADS122C04_3WIRE_HI_TEMP      0x6
+#define ADS122C04_2WIRE_HI_TEMP      0x7
 
 // ADS122C04 Table 16 in Datasheet
 #define ADS122C04_RESET_CMD          0x06     //0000 011x      Reset
@@ -390,6 +393,7 @@ private:
   // Amplifier gain setting
   // ** MAKE SURE THE CONFIG REGISTER 0 GAIN IS THE SAME AS THIS **
   const float PT100_AMPLIFIER_GAIN = 8.0;
+  const float PT100_AMP_GAIN_HI_TEMP = 4.0;
 
   // Internal temperature sensor resolution
   // One 14-bit LSB equals 0.03125°C

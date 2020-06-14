@@ -50,7 +50,6 @@ boolean SFE_ADS122C04::begin(uint8_t deviceAddress, TwoWire &wirePort)
 {
   _deviceAddress = deviceAddress; //If provided, store the I2C address from user
   _i2cPort = &wirePort; //Grab which port the user wants us to use
-  _printDebug = false; //Flag to print debugging variables
   _wireMode = ADS122C04_RAW_MODE; //Default to using 'safe' settings (disable the IDAC current sources)
 
   delay(1); // wait for power-on reset to complete (datasheet says we should do this)
@@ -92,6 +91,24 @@ boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode)
     initParams.routeIDAC2 = ADS122C04_IDAC2_DISABLED; // Disable IDAC2
     _wireMode = ADS122C04_4WIRE_MODE; // Update the wire mode
   }
+  else if (wire_mode == ADS122C04_4WIRE_HI_TEMP) // 4-wire mode for high temperatures (gain = 4)
+  {
+    initParams.inputMux = ADS122C04_MUX_AIN1_AIN0; // Route AIN1 to AINP and AIN0 to AINN
+    initParams.gainLevel = ADS122C04_GAIN_4; // Set the gain to 4
+    initParams.pgaBypass = ADS122C04_PGA_ENABLED; // Enable the PGA
+    initParams.dataRate = ADS122C04_DATA_RATE_20SPS; // Set the data rate (samples per second) to 20
+    initParams.opMode = ADS122C04_OP_MODE_NORMAL; // Disable turbo mode
+    initParams.convMode = ADS122C04_CONVERSION_MODE_SINGLE_SHOT; // Use single shot mode
+    initParams.selectVref = ADS122C04_VREF_EXT_REF_PINS; // Use the external REF pins
+    initParams.tempSensorEn = ADS122C04_TEMP_SENSOR_OFF; // Disable the temperature sensor
+    initParams.dataCounterEn = ADS122C04_DCNT_DISABLE; // Disable the data counter
+    initParams.dataCRCen = ADS122C04_CRC_DISABLED; // Disable CRC checking
+    initParams.burnOutEn = ADS122C04_BURN_OUT_CURRENT_OFF; // Disable the burn-out current
+    initParams.idacCurrent = ADS122C04_IDAC_CURRENT_1000_UA; // Set the IDAC current to 1mA
+    initParams.routeIDAC1 = ADS122C04_IDAC1_AIN3; // Route IDAC1 to AIN3
+    initParams.routeIDAC2 = ADS122C04_IDAC2_DISABLED; // Disable IDAC2
+    _wireMode = ADS122C04_4WIRE_HI_TEMP; // Update the wire mode
+  }
   else if (wire_mode == ADS122C04_3WIRE_MODE) // 3-wire mode
   {
     initParams.inputMux = ADS122C04_MUX_AIN1_AIN0; // Route AIN1 to AINP and AIN0 to AINN
@@ -110,6 +127,24 @@ boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode)
     initParams.routeIDAC2 = ADS122C04_IDAC2_AIN3; // Route IDAC2 to AIN3
     _wireMode = ADS122C04_3WIRE_MODE; // Update the wire mode
   }
+  else if (wire_mode == ADS122C04_3WIRE_HI_TEMP) // 3-wire mode for high temperatures (gain = 4)
+  {
+    initParams.inputMux = ADS122C04_MUX_AIN1_AIN0; // Route AIN1 to AINP and AIN0 to AINN
+    initParams.gainLevel = ADS122C04_GAIN_4; // Set the gain to 4
+    initParams.pgaBypass = ADS122C04_PGA_ENABLED; // Enable the PGA
+    initParams.dataRate = ADS122C04_DATA_RATE_20SPS; // Set the data rate (samples per second) to 20
+    initParams.opMode = ADS122C04_OP_MODE_NORMAL; // Disable turbo mode
+    initParams.convMode = ADS122C04_CONVERSION_MODE_SINGLE_SHOT; // Use single shot mode
+    initParams.selectVref = ADS122C04_VREF_EXT_REF_PINS; // Use the external REF pins
+    initParams.tempSensorEn = ADS122C04_TEMP_SENSOR_OFF; // Disable the temperature sensor
+    initParams.dataCounterEn = ADS122C04_DCNT_DISABLE; // Disable the data counter
+    initParams.dataCRCen = ADS122C04_CRC_DISABLED; // Disable CRC checking
+    initParams.burnOutEn = ADS122C04_BURN_OUT_CURRENT_OFF; // Disable the burn-out current
+    initParams.idacCurrent = ADS122C04_IDAC_CURRENT_500_UA; // Set the IDAC current to 0.5mA
+    initParams.routeIDAC1 = ADS122C04_IDAC1_AIN2; // Route IDAC1 to AIN2
+    initParams.routeIDAC2 = ADS122C04_IDAC2_AIN3; // Route IDAC2 to AIN3
+    _wireMode = ADS122C04_3WIRE_HI_TEMP; // Update the wire mode
+  }
   else if (wire_mode == ADS122C04_2WIRE_MODE) // 2-wire mode
   {
     initParams.inputMux = ADS122C04_MUX_AIN1_AIN0; // Route AIN1 to AINP and AIN0 to AINN
@@ -127,6 +162,24 @@ boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode)
     initParams.routeIDAC1 = ADS122C04_IDAC1_AIN3; // Route IDAC1 to AIN3
     initParams.routeIDAC2 = ADS122C04_IDAC2_DISABLED; // Disable IDAC2
     _wireMode = ADS122C04_2WIRE_MODE; // Update the wire mode
+  }
+  else if (wire_mode == ADS122C04_2WIRE_HI_TEMP) // 2-wire mode for high temperatures (gain = 4)
+  {
+    initParams.inputMux = ADS122C04_MUX_AIN1_AIN0; // Route AIN1 to AINP and AIN0 to AINN
+    initParams.gainLevel = ADS122C04_GAIN_4; // Set the gain to 4
+    initParams.pgaBypass = ADS122C04_PGA_ENABLED; // Enable the PGA
+    initParams.dataRate = ADS122C04_DATA_RATE_20SPS; // Set the data rate (samples per second) to 20
+    initParams.opMode = ADS122C04_OP_MODE_NORMAL; // Disable turbo mode
+    initParams.convMode = ADS122C04_CONVERSION_MODE_SINGLE_SHOT; // Use single shot mode
+    initParams.selectVref = ADS122C04_VREF_EXT_REF_PINS; // Use the external REF pins
+    initParams.tempSensorEn = ADS122C04_TEMP_SENSOR_OFF; // Disable the temperature sensor
+    initParams.dataCounterEn = ADS122C04_DCNT_DISABLE; // Disable the data counter
+    initParams.dataCRCen = ADS122C04_CRC_DISABLED; // Disable CRC checking
+    initParams.burnOutEn = ADS122C04_BURN_OUT_CURRENT_OFF; // Disable the burn-out current
+    initParams.idacCurrent = ADS122C04_IDAC_CURRENT_1000_UA; // Set the IDAC current to 1mA
+    initParams.routeIDAC1 = ADS122C04_IDAC1_AIN3; // Route IDAC1 to AIN3
+    initParams.routeIDAC2 = ADS122C04_IDAC2_DISABLED; // Disable IDAC2
+    _wireMode = ADS122C04_2WIRE_HI_TEMP; // Update the wire mode
   }
   else if (wire_mode == ADS122C04_TEMPERATURE_MODE) // Internal temperature mode
   {
@@ -268,10 +321,18 @@ float SFE_ADS122C04::readPT100Centigrade(void) // Read the temperature in Centig
   // https://www.analog.com/media/en/technical-documentation/application-notes/AN709_0.pdf
 
   // 2^23 is 8388608
-  RTD = ((float)raw_v.UINT32) / 8388608.0; // Load RTD with the scaled ADC value
+  RTD = ((float)raw_v.INT32) / 8388608.0; // Load RTD with the scaled ADC value
   RTD *= PT100_REFERENCE_RESISTOR; // Multiply by the reference resistor
-  RTD /= PT100_AMPLIFIER_GAIN; // Divide by the amplifier gain
-  if (_wireMode == ADS122C04_3WIRE_MODE) // If we are using 3-wire mode
+  // Use the correct gain for high and low temperatures
+  if ((_wireMode == ADS122C04_4WIRE_HI_TEMP) || (_wireMode == ADS122C04_3WIRE_HI_TEMP) || (_wireMode == ADS122C04_2WIRE_HI_TEMP))
+  {
+    RTD /= PT100_AMP_GAIN_HI_TEMP; // Divide by the amplifier gain for high temperatures
+  }
+  else
+  {
+    RTD /= PT100_AMPLIFIER_GAIN; // Divide by the amplifier gain for low temperatures
+  }
+  if ((_wireMode == ADS122C04_3WIRE_MODE) || (_wireMode == ADS122C04_3WIRE_HI_TEMP)) // If we are using 3-wire mode
   {
     RTD *= 2.0; // 3-wire mode needs a factor of 2
   }
