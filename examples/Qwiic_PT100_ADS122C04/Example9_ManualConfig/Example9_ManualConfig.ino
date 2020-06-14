@@ -86,20 +86,20 @@ void loop()
     return;
   }
 
-  // Read the raw ADC data
+  // Read the raw (signed) ADC data
   // The ADC data is returned in the least-significant 24-bits
   uint32_t raw_ADC_data = mySensor.readADC();
 
-  // Mask off the least-significant 24-bits, just in case
-  raw_ADC_data &= 0x00ffffff;
-
-  // Use sprintf to convert raw_ADC_data to a char array
-  char myStr[7]; // Create storage for 6 hex digits plus a null
-  sprintf(myStr, "%06X", raw_ADC_data);
-
   // Print the raw ADC data
   Serial.print(F("The raw ADC data is 0x"));
-  Serial.println(myStr);
+
+  // Pad the zeros
+  if (raw_ADC_data <= 0xFFFFF) Serial.print(F("0"));
+  if (raw_ADC_data <= 0xFFFF) Serial.print(F("0"));
+  if (raw_ADC_data <= 0xFFF) Serial.print(F("0"));
+  if (raw_ADC_data <= 0xFF) Serial.print(F("0"));
+  if (raw_ADC_data <= 0xF) Serial.print(F("0"));
+  Serial.println(raw_ADC_data, HEX);
 
   delay(250); //Don't pound the I2C bus too hard
 }
