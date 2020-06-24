@@ -17,7 +17,7 @@
 
 #include <Wire.h>
 
-#include <SparkFun_ADS122C04_ADC_Arduino_Library.h>
+#include <SparkFun_ADS122C04_ADC_Arduino_Library.h> // Click here to get the library: http://librarymanager/All#SparkFun_ADS122C0
 
 SFE_ADS122C04 mySensor;
 
