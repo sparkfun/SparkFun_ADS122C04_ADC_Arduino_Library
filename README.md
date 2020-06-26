@@ -15,7 +15,7 @@ variety of applications including being able to measure temperature accurately f
 
 ## Products That Use This Library
 
-- [Qwiic PT100 ADS122C04](https://github.com/sparkfun/Qwiic_PT100_ADS122C04)
+- [Qwiic PT100 - ADS122C04 (SPX-16770)](https://www.sparkfun.com/products/16770)
 
 ## Documentation
 
