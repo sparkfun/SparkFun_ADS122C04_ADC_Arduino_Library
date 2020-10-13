@@ -128,9 +128,9 @@
 #define ADS122C04_GAIN_64           0x6
 #define ADS122C04_GAIN_128          0x7
 
-// PGA Bypass
-#define ADS122C04_PGA_DISABLED      0x0
-#define ADS122C04_PGA_ENABLED       0x1
+// PGA Bypass (PGA is disabled when the PGA_BYPASS bit is set)
+#define ADS122C04_PGA_DISABLED      0x1
+#define ADS122C04_PGA_ENABLED       0x0
 
 // Configuration Register 1
 // ADS122C04 Table 19 in Datasheet

@@ -6,6 +6,10 @@ a low-noise programmable gain amplifier, two programmable current sources, a vol
 and an in-built precision temperature sensor. In summary, it contains everything you need for a wide
 variety of applications including being able to measure temperature accurately from remote sensors.
 
+Thanks to:
+
+- [deviashin](https://github.com/sparkfun/SparkFun_ADS122C04_ADC_Arduino_Library/issues/3) for identifying that the PGA bypass was inverted.
+
 ## Repository Contents
 
 - **/examples** - Example sketches for the library (.ino). Run these from the Arduino IDE.
