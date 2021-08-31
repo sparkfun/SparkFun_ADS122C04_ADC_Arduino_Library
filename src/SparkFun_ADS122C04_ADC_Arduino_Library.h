@@ -376,6 +376,10 @@ public:
   // Print the ADS122C04 configuration (but only if enableDebugging has been called)
   void printADS122C04config(void);
 
+  // Requested in #5
+  uint8_t getDeviceAddress(void) { return (_deviceAddress); }
+  uint8_t getWireMode(void) { return (_wireMode); }
+
 private:
   //Variables
   TwoWire *_i2cPort;		//The generic connection to user's chosen I2C hardware
