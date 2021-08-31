@@ -69,7 +69,7 @@ boolean SFE_ADS122C04::begin(uint8_t deviceAddress, TwoWire &wirePort)
 }
 
 // Configure the chip for the selected wire mode
-boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode)
+boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode, uint8_t rate)
 {
   ADS122C04_initParam initParams; // Storage for the chip parameters
 
@@ -78,7 +78,7 @@ boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode)
     initParams.inputMux = ADS122C04_MUX_AIN1_AIN0; // Route AIN1 to AINP and AIN0 to AINN
     initParams.gainLevel = ADS122C04_GAIN_8; // Set the gain to 8
     initParams.pgaBypass = ADS122C04_PGA_ENABLED; // The PGA must be enabled for gains >= 8
-    initParams.dataRate = ADS122C04_DATA_RATE_20SPS; // Set the data rate (samples per second) to 20
+    initParams.dataRate = rate; // Set the data rate (samples per second). Defaults to 20
     initParams.opMode = ADS122C04_OP_MODE_NORMAL; // Disable turbo mode
     initParams.convMode = ADS122C04_CONVERSION_MODE_SINGLE_SHOT; // Use single shot mode
     initParams.selectVref = ADS122C04_VREF_EXT_REF_PINS; // Use the external REF pins
@@ -96,7 +96,7 @@ boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode)
     initParams.inputMux = ADS122C04_MUX_AIN1_AIN0; // Route AIN1 to AINP and AIN0 to AINN
     initParams.gainLevel = ADS122C04_GAIN_4; // Set the gain to 4
     initParams.pgaBypass = ADS122C04_PGA_ENABLED; // Enable the PGA
-    initParams.dataRate = ADS122C04_DATA_RATE_20SPS; // Set the data rate (samples per second) to 20
+    initParams.dataRate = rate; // Set the data rate (samples per second). Defaults to 20
     initParams.opMode = ADS122C04_OP_MODE_NORMAL; // Disable turbo mode
     initParams.convMode = ADS122C04_CONVERSION_MODE_SINGLE_SHOT; // Use single shot mode
     initParams.selectVref = ADS122C04_VREF_EXT_REF_PINS; // Use the external REF pins
@@ -114,7 +114,7 @@ boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode)
     initParams.inputMux = ADS122C04_MUX_AIN1_AIN0; // Route AIN1 to AINP and AIN0 to AINN
     initParams.gainLevel = ADS122C04_GAIN_8; // Set the gain to 8
     initParams.pgaBypass = ADS122C04_PGA_ENABLED; // The PGA must be enabled for gains >= 8
-    initParams.dataRate = ADS122C04_DATA_RATE_20SPS; // Set the data rate (samples per second) to 20
+    initParams.dataRate = rate; // Set the data rate (samples per second). Defaults to 20
     initParams.opMode = ADS122C04_OP_MODE_NORMAL; // Disable turbo mode
     initParams.convMode = ADS122C04_CONVERSION_MODE_SINGLE_SHOT; // Use single shot mode
     initParams.selectVref = ADS122C04_VREF_EXT_REF_PINS; // Use the external REF pins
@@ -132,7 +132,7 @@ boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode)
     initParams.inputMux = ADS122C04_MUX_AIN1_AIN0; // Route AIN1 to AINP and AIN0 to AINN
     initParams.gainLevel = ADS122C04_GAIN_4; // Set the gain to 4
     initParams.pgaBypass = ADS122C04_PGA_ENABLED; // Enable the PGA
-    initParams.dataRate = ADS122C04_DATA_RATE_20SPS; // Set the data rate (samples per second) to 20
+    initParams.dataRate = rate; // Set the data rate (samples per second). Defaults to 20
     initParams.opMode = ADS122C04_OP_MODE_NORMAL; // Disable turbo mode
     initParams.convMode = ADS122C04_CONVERSION_MODE_SINGLE_SHOT; // Use single shot mode
     initParams.selectVref = ADS122C04_VREF_EXT_REF_PINS; // Use the external REF pins
@@ -150,7 +150,7 @@ boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode)
     initParams.inputMux = ADS122C04_MUX_AIN1_AIN0; // Route AIN1 to AINP and AIN0 to AINN
     initParams.gainLevel = ADS122C04_GAIN_8; // Set the gain to 8
     initParams.pgaBypass = ADS122C04_PGA_ENABLED; // The PGA must be enabled for gains >= 8
-    initParams.dataRate = ADS122C04_DATA_RATE_20SPS; // Set the data rate (samples per second) to 20
+    initParams.dataRate = rate; // Set the data rate (samples per second). Defaults to 20
     initParams.opMode = ADS122C04_OP_MODE_NORMAL; // Disable turbo mode
     initParams.convMode = ADS122C04_CONVERSION_MODE_SINGLE_SHOT; // Use single shot mode
     initParams.selectVref = ADS122C04_VREF_EXT_REF_PINS; // Use the external REF pins
@@ -168,7 +168,7 @@ boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode)
     initParams.inputMux = ADS122C04_MUX_AIN1_AIN0; // Route AIN1 to AINP and AIN0 to AINN
     initParams.gainLevel = ADS122C04_GAIN_4; // Set the gain to 4
     initParams.pgaBypass = ADS122C04_PGA_ENABLED; // Enable the PGA
-    initParams.dataRate = ADS122C04_DATA_RATE_20SPS; // Set the data rate (samples per second) to 20
+    initParams.dataRate = rate; // Set the data rate (samples per second). Defaults to 20
     initParams.opMode = ADS122C04_OP_MODE_NORMAL; // Disable turbo mode
     initParams.convMode = ADS122C04_CONVERSION_MODE_SINGLE_SHOT; // Use single shot mode
     initParams.selectVref = ADS122C04_VREF_EXT_REF_PINS; // Use the external REF pins
@@ -186,7 +186,7 @@ boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode)
     initParams.inputMux = ADS122C04_MUX_AIN1_AIN0; // Route AIN1 to AINP and AIN0 to AINN
     initParams.gainLevel = ADS122C04_GAIN_1; // Set the gain to 1
     initParams.pgaBypass = ADS122C04_PGA_DISABLED;
-    initParams.dataRate = ADS122C04_DATA_RATE_20SPS; // Set the data rate (samples per second) to 20
+    initParams.dataRate = rate; // Set the data rate (samples per second). Defaults to 20
     initParams.opMode = ADS122C04_OP_MODE_NORMAL; // Disable turbo mode
     initParams.convMode = ADS122C04_CONVERSION_MODE_SINGLE_SHOT; // Use single shot mode
     initParams.selectVref = ADS122C04_VREF_INTERNAL; // Use the internal 2.048V reference
@@ -204,7 +204,7 @@ boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode)
     initParams.inputMux = ADS122C04_MUX_AIN1_AIN0; // Route AIN1 to AINP and AIN0 to AINN
     initParams.gainLevel = ADS122C04_GAIN_1; // Set the gain to 1
     initParams.pgaBypass = ADS122C04_PGA_DISABLED;
-    initParams.dataRate = ADS122C04_DATA_RATE_20SPS; // Set the data rate (samples per second) to 20
+    initParams.dataRate = rate; // Set the data rate (samples per second). Defaults to 20
     initParams.opMode = ADS122C04_OP_MODE_NORMAL; // Disable turbo mode
     initParams.convMode = ADS122C04_CONVERSION_MODE_SINGLE_SHOT; // Use single shot mode
     initParams.selectVref = ADS122C04_VREF_INTERNAL; // Use the internal 2.048V reference
@@ -373,16 +373,17 @@ float SFE_ADS122C04::readPT100Fahrenheit(void) // Read the temperature in Fahren
 
 // Read the raw signed 24-bit ADC value as int32_t
 // The result needs to be multiplied by VREF / GAIN to convert to Volts
-int32_t SFE_ADS122C04::readRawVoltage(void)
+int32_t SFE_ADS122C04::readRawVoltage(uint8_t rate)
 {
   raw_voltage_union raw_v; // union to convert uint32_t to int32_t
   unsigned long start_time = millis(); // Record the start time so we can timeout
   boolean drdy = false; // DRDY (1 == new data is ready)
   uint8_t previousWireMode = _wireMode; // Record the previous wire mode so we can restore it
+  uint8_t previousRate = ADS122C04_Reg.reg1.bit.DR; // Record the previous rate so we can restore it
 
   // Configure the ADS122C04 for raw mode
   // Disable the IDAC, use the internal 2.048V reference and set the gain to 1
-  if ((configureADCmode(ADS122C04_RAW_MODE)) == false)
+  if ((configureADCmode(ADS122C04_RAW_MODE, rate)) == false)
   {
     if (_printDebug == true)
     {
@@ -408,7 +409,7 @@ int32_t SFE_ADS122C04::readRawVoltage(void)
     {
       _debugPort->println(F("readRawVoltage: checkDataReady timed out"));
     }
-    configureADCmode(previousWireMode); // Attempt to restore the previous wire mode
+    configureADCmode(previousWireMode, previousRate); // Attempt to restore the previous wire mode
     return(0);
   }
 
@@ -419,12 +420,12 @@ int32_t SFE_ADS122C04::readRawVoltage(void)
     {
       _debugPort->println(F("readRawVoltage: ADS122C04_getConversionData failed"));
     }
-    configureADCmode(previousWireMode); // Attempt to restore the previous wire mode
+    configureADCmode(previousWireMode, previousRate); // Attempt to restore the previous wire mode
     return(0);
   }
 
   // Restore the previous wire mode
-  if ((configureADCmode(previousWireMode)) == false)
+  if ((configureADCmode(previousWireMode, previousRate)) == false)
   {
   if (_printDebug == true)
     {
@@ -463,7 +464,7 @@ uint32_t SFE_ADS122C04::readADC(void)
 }
 
 // Read the internal temperature
-float SFE_ADS122C04::readInternalTemperature(void)
+float SFE_ADS122C04::readInternalTemperature(uint8_t rate)
 {
   internal_temperature_union int_temp; // union to convert uint16_t to int16_t
   uint32_t raw_temp; // The raw temperature from the ADC
@@ -471,10 +472,11 @@ float SFE_ADS122C04::readInternalTemperature(void)
   boolean drdy = false; // DRDY (1 == new data is ready)
   float ret_val = 0.0; // The return value
   uint8_t previousWireMode = _wireMode; // Record the previous wire mode so we can restore it
+  uint8_t previousRate = ADS122C04_Reg.reg1.bit.DR; // Record the previous rate so we can restore it
 
   // Enable the internal temperature sensor
   // Reading the ADC value will return the temperature
-  if ((configureADCmode(ADS122C04_TEMPERATURE_MODE)) == false)
+  if ((configureADCmode(ADS122C04_TEMPERATURE_MODE, rate)) == false)
   {
     if (_printDebug == true)
     {
@@ -500,7 +502,7 @@ float SFE_ADS122C04::readInternalTemperature(void)
     {
       _debugPort->println(F("readInternalTemperature: checkDataReady timed out"));
     }
-    configureADCmode(previousWireMode); // Attempt to restore the previous wire mode
+    configureADCmode(previousWireMode, previousRate); // Attempt to restore the previous wire mode
     return(ret_val);
   }
 
@@ -511,12 +513,12 @@ float SFE_ADS122C04::readInternalTemperature(void)
     {
       _debugPort->println(F("readInternalTemperature: ADS122C04_getConversionData failed"));
     }
-    configureADCmode(previousWireMode); // Attempt to restore the previous wire mode
+    configureADCmode(previousWireMode, previousRate); // Attempt to restore the previous wire mode
     return(ret_val);
   }
 
   // Restore the previous wire mode
-  if ((configureADCmode(previousWireMode)) == false)
+  if ((configureADCmode(previousWireMode, previousRate)) == false)
   {
   if (_printDebug == true)
     {
