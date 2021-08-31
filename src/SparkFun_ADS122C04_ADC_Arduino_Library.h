@@ -324,21 +324,21 @@ public:
   // Read the raw signed 24-bit ADC value as int32_t
   // This uses the internal 2.048V reference with the gain set to 1
   // The LSB is 2.048 / 2^23 = 0.24414 uV (0.24414 microvolts)
-  int32_t readRawVoltage(void);
+  int32_t readRawVoltage(uint8_t rate = ADS122C04_DATA_RATE_20SPS);
 
   // Read the raw signed 24-bit ADC value as uint32_t
   // The ADC data is returned in the least-significant 24-bits
   uint32_t readADC(void);
 
   // Read the internal temperature (C)
-  float readInternalTemperature(void);
+  float readInternalTemperature(uint8_t rate = ADS122C04_DATA_RATE_20SPS);
 
   boolean reset(void); // Reset the ADS122C04
   boolean start(void); // Start a conversion
   boolean powerdown(void); // Put the chip into low power mode
 
   // Default to using 'safe' settings (disable the IDAC current sources)
-  boolean configureADCmode(uint8_t wire_mode = ADS122C04_RAW_MODE); // Configure the chip for the chosen mode
+  boolean configureADCmode(uint8_t wire_mode = ADS122C04_RAW_MODE, uint8_t rate = ADS122C04_DATA_RATE_20SPS); // Configure the chip for the chosen mode
 
   // Default to using 'safe' settings (disable the IDAC current sources)
   boolean setInputMultiplexer(uint8_t mux_config = ADS122C04_MUX_AIN1_AIN0); // Configure the input multiplexer
@@ -375,6 +375,10 @@ public:
 
   // Print the ADS122C04 configuration (but only if enableDebugging has been called)
   void printADS122C04config(void);
+
+  // Requested in #5
+  uint8_t getDeviceAddress(void) { return (_deviceAddress); }
+  uint8_t getWireMode(void) { return (_wireMode); }
 
 private:
   //Variables

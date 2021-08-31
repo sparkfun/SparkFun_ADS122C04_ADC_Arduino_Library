@@ -56,7 +56,8 @@ getIDACcurrent	KEYWORD2
 getIDAC1mux	KEYWORD2
 getIDAC2mux	KEYWORD2
 printADS122C04config	KEYWORD2
-
+getDeviceAddress	KEYWORD2
+getWireMode	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
