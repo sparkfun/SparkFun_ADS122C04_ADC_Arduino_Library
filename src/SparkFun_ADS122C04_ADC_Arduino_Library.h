@@ -242,7 +242,7 @@ union CONFIG_REG_1_U {
 struct CONFIG_REG_2{
   uint8_t IDAC:3;                                 // 0-2
   uint8_t BCS:1;                                  // 3
-  uint8_t CRC:2;                                  // 4-5
+  uint8_t CRCbits:2;                              // 4-5
   uint8_t DCNT:1;                                 // 6
   uint8_t DRDY:1;                                 // 7
 };
