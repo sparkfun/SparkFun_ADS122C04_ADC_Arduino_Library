@@ -644,7 +644,7 @@ boolean SFE_ADS122C04::setDataIntegrityCheck(uint8_t setting)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_2_REG, &ADS122C04_Reg.reg2.all)) == false)
     return(false);
-  ADS122C04_Reg.reg2.bit.CRC = setting;
+  ADS122C04_Reg.reg2.bit.CRCbits = setting;
   return(ADS122C04_writeReg(ADS122C04_CONFIG_2_REG, ADS122C04_Reg.reg2.all));
 }
 
@@ -769,7 +769,7 @@ uint8_t SFE_ADS122C04::getDataCounter(void)
 uint8_t SFE_ADS122C04::getDataIntegrityCheck(void)
 {
   ADS122C04_readReg(ADS122C04_CONFIG_2_REG, &ADS122C04_Reg.reg2.all);
-  return(ADS122C04_Reg.reg2.bit.CRC);
+  return(ADS122C04_Reg.reg2.bit.CRCbits);
 }
 
 // Get the burn-out current status
@@ -824,7 +824,7 @@ boolean SFE_ADS122C04::ADS122C04_init(ADS122C04_initParam *param)
   ADS122C04_Reg.reg1.bit.TS = param->tempSensorEn;
 
   ADS122C04_Reg.reg2.bit.DCNT = param->dataCounterEn;
-  ADS122C04_Reg.reg2.bit.CRC = param->dataCRCen;
+  ADS122C04_Reg.reg2.bit.CRCbits = param->dataCRCen;
   ADS122C04_Reg.reg2.bit.BCS = param->burnOutEn;
   ADS122C04_Reg.reg2.bit.IDAC = param->idacCurrent;
 
@@ -882,7 +882,7 @@ void SFE_ADS122C04::printADS122C04config(void)
       _debugPort->print(F("ConfigReg2: DCNT="));
       _debugPort->print(ADS122C04_Reg.reg2.bit.DCNT);
       _debugPort->print(F(" CRC="));
-      _debugPort->print(ADS122C04_Reg.reg2.bit.CRC);
+      _debugPort->print(ADS122C04_Reg.reg2.bit.CRCbits);
       _debugPort->print(F(" BCS="));
       _debugPort->print(ADS122C04_Reg.reg2.bit.BCS);
       _debugPort->print(F(" IDAC="));
