@@ -310,10 +310,10 @@ public:
   SFE_ADS122C04(void);
 
   //By default use the default I2C address, and use Wire port
-  boolean begin(uint8_t deviceAddress = 0x45, TwoWire &wirePort = Wire); //Returns true if module is detected
+  bool begin(uint8_t deviceAddress = 0x45, TwoWire &wirePort = Wire); //Returns true if module is detected
 
   //Returns true if device answers on _deviceAddress
-  boolean isConnected(void);
+  bool isConnected(void);
 
   void enableDebugging(Stream &debugPort = Serial); // enable debug messages
   void disableDebugging(); // disable debug messages
@@ -333,30 +333,30 @@ public:
   // Read the internal temperature (C)
   float readInternalTemperature(uint8_t rate = ADS122C04_DATA_RATE_20SPS);
 
-  boolean reset(void); // Reset the ADS122C04
-  boolean start(void); // Start a conversion
-  boolean powerdown(void); // Put the chip into low power mode
+  bool reset(void); // Reset the ADS122C04
+  bool start(void); // Start a conversion
+  bool powerdown(void); // Put the chip into low power mode
 
   // Default to using 'safe' settings (disable the IDAC current sources)
-  boolean configureADCmode(uint8_t wire_mode = ADS122C04_RAW_MODE, uint8_t rate = ADS122C04_DATA_RATE_20SPS); // Configure the chip for the chosen mode
+  bool configureADCmode(uint8_t wire_mode = ADS122C04_RAW_MODE, uint8_t rate = ADS122C04_DATA_RATE_20SPS); // Configure the chip for the chosen mode
 
   // Default to using 'safe' settings (disable the IDAC current sources)
-  boolean setInputMultiplexer(uint8_t mux_config = ADS122C04_MUX_AIN1_AIN0); // Configure the input multiplexer
-  boolean setGain(uint8_t gain_config = ADS122C04_GAIN_1); // Configure the gain
-  boolean enablePGA(uint8_t enable = ADS122C04_PGA_DISABLED); // Enable/disable the Programmable Gain Amplifier
-  boolean setDataRate(uint8_t rate = ADS122C04_DATA_RATE_20SPS); // Set the data rate (sample speed)
-  boolean setOperatingMode(uint8_t mode = ADS122C04_OP_MODE_NORMAL); // Configure the operating mode (normal / turbo)
-  boolean setConversionMode(uint8_t mode = ADS122C04_CONVERSION_MODE_SINGLE_SHOT); // Configure the conversion mode (single-shot / continuous)
-  boolean setVoltageReference(uint8_t ref = ADS122C04_VREF_INTERNAL); // Configure the voltage reference
-  boolean enableInternalTempSensor(uint8_t enable = ADS122C04_TEMP_SENSOR_OFF); // Enable / disable the internal temperature sensor
-  boolean setDataCounter(uint8_t enable = ADS122C04_DCNT_DISABLE); // Enable / disable the conversion data counter
-  boolean setDataIntegrityCheck(uint8_t setting = ADS122C04_CRC_DISABLED); // Configure the data integrity check
-  boolean setBurnOutCurrent(uint8_t enable = ADS122C04_BURN_OUT_CURRENT_OFF); // Enable / disable the 10uA burn-out current source
-  boolean setIDACcurrent(uint8_t current = ADS122C04_IDAC_CURRENT_OFF); // Configure the internal programmable current sources
-  boolean setIDAC1mux(uint8_t setting = ADS122C04_IDAC1_DISABLED); // Configure the IDAC1 routing
-  boolean setIDAC2mux(uint8_t setting = ADS122C04_IDAC2_DISABLED); // Configure the IDAC2 routing
+  bool setInputMultiplexer(uint8_t mux_config = ADS122C04_MUX_AIN1_AIN0); // Configure the input multiplexer
+  bool setGain(uint8_t gain_config = ADS122C04_GAIN_1); // Configure the gain
+  bool enablePGA(uint8_t enable = ADS122C04_PGA_DISABLED); // Enable/disable the Programmable Gain Amplifier
+  bool setDataRate(uint8_t rate = ADS122C04_DATA_RATE_20SPS); // Set the data rate (sample speed)
+  bool setOperatingMode(uint8_t mode = ADS122C04_OP_MODE_NORMAL); // Configure the operating mode (normal / turbo)
+  bool setConversionMode(uint8_t mode = ADS122C04_CONVERSION_MODE_SINGLE_SHOT); // Configure the conversion mode (single-shot / continuous)
+  bool setVoltageReference(uint8_t ref = ADS122C04_VREF_INTERNAL); // Configure the voltage reference
+  bool enableInternalTempSensor(uint8_t enable = ADS122C04_TEMP_SENSOR_OFF); // Enable / disable the internal temperature sensor
+  bool setDataCounter(uint8_t enable = ADS122C04_DCNT_DISABLE); // Enable / disable the conversion data counter
+  bool setDataIntegrityCheck(uint8_t setting = ADS122C04_CRC_DISABLED); // Configure the data integrity check
+  bool setBurnOutCurrent(uint8_t enable = ADS122C04_BURN_OUT_CURRENT_OFF); // Enable / disable the 10uA burn-out current source
+  bool setIDACcurrent(uint8_t current = ADS122C04_IDAC_CURRENT_OFF); // Configure the internal programmable current sources
+  bool setIDAC1mux(uint8_t setting = ADS122C04_IDAC1_DISABLED); // Configure the IDAC1 routing
+  bool setIDAC2mux(uint8_t setting = ADS122C04_IDAC2_DISABLED); // Configure the IDAC2 routing
 
-  boolean checkDataReady(void); // Check the status of the DRDY bit in Config Register 2
+  bool checkDataReady(void); // Check the status of the DRDY bit in Config Register 2
 
   uint8_t getInputMultiplexer(void); // Get the input multiplexer configuration
   uint8_t getGain(void); // Get the gain setting
@@ -386,10 +386,10 @@ private:
   uint8_t _deviceAddress; //Keeps track of I2C address. setI2CAddress changes this.
 
   Stream *_debugPort;			 //The stream to send debug messages to if enabled. Usually Serial.
-  boolean _printDebug = false; //Flag to print debugging variables
+  bool _printDebug = false; //Flag to print debugging variables
 
   // Keep a copy of the wire mode so we can restore it after reading the internal temperature
-  uint8_t _wireMode = ADS122C04_4WIRE_MODE;
+  uint8_t _wireMode = ADS122C04_RAW_MODE; //Default to using 'safe' settings (disable the IDAC current sources)
 
   // Resistance of the reference resistor
   const float PT100_REFERENCE_RESISTOR = 1620.0;
@@ -408,15 +408,15 @@ private:
   void debugPrint(char *message); // print a debug message
   void debugPrintln(char *message); // print a debug message with line feed
 
-  boolean ADS122C04_init(ADS122C04_initParam *param); // initialise the ADS122C04 with these parameters
+  bool ADS122C04_init(ADS122C04_initParam *param); // initialise the ADS122C04 with these parameters
 
-  boolean ADS122C04_writeReg(uint8_t reg, uint8_t writeValue); // write a value to the selected register
-  boolean ADS122C04_readReg(uint8_t reg, uint8_t *readValue); // read a value from the selected register (returned in readValue)
+  bool ADS122C04_writeReg(uint8_t reg, uint8_t writeValue); // write a value to the selected register
+  bool ADS122C04_readReg(uint8_t reg, uint8_t *readValue); // read a value from the selected register (returned in readValue)
 
-  boolean ADS122C04_getConversionData(uint32_t *conversionData); // read the raw 24-bit conversion result
-  boolean ADS122C04_getConversionDataWithCount(uint32_t *conversionData, uint8_t *count); // read the raw conversion result and count (if enabled)
+  bool ADS122C04_getConversionData(uint32_t *conversionData); // read the raw 24-bit conversion result
+  bool ADS122C04_getConversionDataWithCount(uint32_t *conversionData, uint8_t *count); // read the raw conversion result and count (if enabled)
 
-  boolean ADS122C04_sendCommand(uint8_t command); // write to the selected command register
-  boolean ADS122C04_sendCommandWithValue(uint8_t command, uint8_t value); // write a value to the selected command register
+  bool ADS122C04_sendCommand(uint8_t command); // write to the selected command register
+  bool ADS122C04_sendCommandWithValue(uint8_t command, uint8_t value); // write a value to the selected command register
 };
 #endif
