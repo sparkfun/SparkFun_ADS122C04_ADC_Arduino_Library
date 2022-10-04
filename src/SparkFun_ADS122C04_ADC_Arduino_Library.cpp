@@ -46,7 +46,7 @@ SFE_ADS122C04::SFE_ADS122C04(void)
 
 //Attempt communication with the device and initialise it
 //Return true if successful
-boolean SFE_ADS122C04::begin(uint8_t deviceAddress, TwoWire &wirePort)
+bool SFE_ADS122C04::begin(uint8_t deviceAddress, TwoWire &wirePort)
 {
   _deviceAddress = deviceAddress; //If provided, store the I2C address from user
   _i2cPort = &wirePort; //Grab which port the user wants us to use
@@ -69,7 +69,7 @@ boolean SFE_ADS122C04::begin(uint8_t deviceAddress, TwoWire &wirePort)
 }
 
 // Configure the chip for the selected wire mode
-boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode, uint8_t rate)
+bool SFE_ADS122C04::configureADCmode(uint8_t wire_mode, uint8_t rate)
 {
   ADS122C04_initParam initParams; // Storage for the chip parameters
 
@@ -229,7 +229,7 @@ boolean SFE_ADS122C04::configureADCmode(uint8_t wire_mode, uint8_t rate)
 }
 
 //Returns true if device answers on _deviceAddress
-boolean SFE_ADS122C04::isConnected(void)
+bool SFE_ADS122C04::isConnected(void)
 {
   _i2cPort->beginTransmission((uint8_t)_deviceAddress);
   return (_i2cPort->endTransmission() == 0);
@@ -269,7 +269,7 @@ float SFE_ADS122C04::readPT100Centigrade(void) // Read the temperature in Centig
 {
   raw_voltage_union raw_v; // union to convert uint32_t to int32_t
   unsigned long start_time = millis(); // Record the start time so we can timeout
-  boolean drdy = false; // DRDY (1 == new data is ready)
+  bool drdy = false; // DRDY (1 == new data is ready)
   float ret_val = 0.0; // Return value
   float RTD, POLY; // Variables needed to convert RTD to Centigrade
 
@@ -279,7 +279,7 @@ float SFE_ADS122C04::readPT100Centigrade(void) // Read the temperature in Centig
   // Wait for DRDY to go valid
   while((drdy == false) && (millis() < (start_time + ADS122C04_CONVERSION_TIMEOUT)))
   {
-    delay(5); // Don't pound the bus too hard
+    delay(1); // Don't pound the bus too hard
     drdy = checkDataReady();
   }
 
@@ -377,19 +377,23 @@ int32_t SFE_ADS122C04::readRawVoltage(uint8_t rate)
 {
   raw_voltage_union raw_v; // union to convert uint32_t to int32_t
   unsigned long start_time = millis(); // Record the start time so we can timeout
-  boolean drdy = false; // DRDY (1 == new data is ready)
+  bool drdy = false; // DRDY (1 == new data is ready)
   uint8_t previousWireMode = _wireMode; // Record the previous wire mode so we can restore it
   uint8_t previousRate = ADS122C04_Reg.reg1.bit.DR; // Record the previous rate so we can restore it
+  bool configChanged = (_wireMode != ADS122C04_RAW_MODE) || (previousRate != rate); // Only change the configuration if we need to
 
   // Configure the ADS122C04 for raw mode
   // Disable the IDAC, use the internal 2.048V reference and set the gain to 1
-  if ((configureADCmode(ADS122C04_RAW_MODE, rate)) == false)
+  if (configChanged)
   {
-    if (_printDebug == true)
+    if ((configureADCmode(ADS122C04_RAW_MODE, rate)) == false)
     {
-      _debugPort->println(F("readRawVoltage: configureADCmode (1) failed"));
+      if (_printDebug == true)
+      {
+        _debugPort->println(F("readRawVoltage: configureADCmode (1) failed"));
+      }
+      return(0);
     }
-    return(0);
   }
 
   // Start the conversion (assumes we are using single shot mode)
@@ -398,7 +402,7 @@ int32_t SFE_ADS122C04::readRawVoltage(uint8_t rate)
   // Wait for DRDY to go valid
   while((drdy == false) && (millis() < (start_time + ADS122C04_CONVERSION_TIMEOUT)))
   {
-    delay(5); // Don't pound the bus too hard
+    delay(1); // Don't pound the bus too hard
     drdy = checkDataReady();
   }
 
@@ -409,7 +413,8 @@ int32_t SFE_ADS122C04::readRawVoltage(uint8_t rate)
     {
       _debugPort->println(F("readRawVoltage: checkDataReady timed out"));
     }
-    configureADCmode(previousWireMode, previousRate); // Attempt to restore the previous wire mode
+    if (configChanged)
+      configureADCmode(previousWireMode, previousRate); // Attempt to restore the previous wire mode
     return(0);
   }
 
@@ -420,18 +425,22 @@ int32_t SFE_ADS122C04::readRawVoltage(uint8_t rate)
     {
       _debugPort->println(F("readRawVoltage: ADS122C04_getConversionData failed"));
     }
-    configureADCmode(previousWireMode, previousRate); // Attempt to restore the previous wire mode
+    if (configChanged)
+      configureADCmode(previousWireMode, previousRate); // Attempt to restore the previous wire mode
     return(0);
   }
 
   // Restore the previous wire mode
-  if ((configureADCmode(previousWireMode, previousRate)) == false)
+  if (configChanged)
   {
-  if (_printDebug == true)
+    if ((configureADCmode(previousWireMode, previousRate)) == false)
     {
-      _debugPort->println(F("readRawVoltage: configureADCmode (2) failed"));
+    if (_printDebug == true)
+      {
+        _debugPort->println(F("readRawVoltage: configureADCmode (2) failed"));
+      }
+      return(0);
     }
-    return(0);
   }
 
   // The raw voltage is in the bottom 24 bits of raw_temp
@@ -469,20 +478,24 @@ float SFE_ADS122C04::readInternalTemperature(uint8_t rate)
   internal_temperature_union int_temp; // union to convert uint16_t to int16_t
   uint32_t raw_temp; // The raw temperature from the ADC
   unsigned long start_time = millis(); // Record the start time so we can timeout
-  boolean drdy = false; // DRDY (1 == new data is ready)
+  bool drdy = false; // DRDY (1 == new data is ready)
   float ret_val = 0.0; // The return value
   uint8_t previousWireMode = _wireMode; // Record the previous wire mode so we can restore it
   uint8_t previousRate = ADS122C04_Reg.reg1.bit.DR; // Record the previous rate so we can restore it
+  bool configChanged = (_wireMode != ADS122C04_TEMPERATURE_MODE) || (previousRate != rate); // Only change the configuration if we need to
 
   // Enable the internal temperature sensor
   // Reading the ADC value will return the temperature
-  if ((configureADCmode(ADS122C04_TEMPERATURE_MODE, rate)) == false)
+  if (configChanged)
   {
-    if (_printDebug == true)
+    if ((configureADCmode(ADS122C04_TEMPERATURE_MODE, rate)) == false)
     {
-      _debugPort->println(F("readInternalTemperature: configureADCmode (1) failed"));
+      if (_printDebug == true)
+      {
+        _debugPort->println(F("readInternalTemperature: configureADCmode (1) failed"));
+      }
+      return(ret_val);
     }
-    return(ret_val);
   }
 
   // Start the conversion
@@ -491,7 +504,7 @@ float SFE_ADS122C04::readInternalTemperature(uint8_t rate)
   // Wait for DRDY to go valid
   while((drdy == false) && (millis() < (start_time + ADS122C04_CONVERSION_TIMEOUT)))
   {
-    delay(5); // Don't pound the bus too hard
+    delay(1); // Don't pound the bus too hard
     drdy = checkDataReady();
   }
 
@@ -502,7 +515,8 @@ float SFE_ADS122C04::readInternalTemperature(uint8_t rate)
     {
       _debugPort->println(F("readInternalTemperature: checkDataReady timed out"));
     }
-    configureADCmode(previousWireMode, previousRate); // Attempt to restore the previous wire mode
+    if (configChanged)
+      configureADCmode(previousWireMode, previousRate); // Attempt to restore the previous wire mode
     return(ret_val);
   }
 
@@ -513,18 +527,22 @@ float SFE_ADS122C04::readInternalTemperature(uint8_t rate)
     {
       _debugPort->println(F("readInternalTemperature: ADS122C04_getConversionData failed"));
     }
-    configureADCmode(previousWireMode, previousRate); // Attempt to restore the previous wire mode
+    if (configChanged)
+      configureADCmode(previousWireMode, previousRate); // Attempt to restore the previous wire mode
     return(ret_val);
   }
 
   // Restore the previous wire mode
-  if ((configureADCmode(previousWireMode, previousRate)) == false)
+  if (configChanged)
   {
-  if (_printDebug == true)
+    if ((configureADCmode(previousWireMode, previousRate)) == false)
     {
-      _debugPort->println(F("readInternalTemperature: configureADCmode (2) failed"));
+      if (_printDebug == true)
+      {
+        _debugPort->println(F("readInternalTemperature: configureADCmode (2) failed"));
+      }
+      return(ret_val);
     }
-    return(ret_val);
   }
 
   if (_printDebug == true)
@@ -554,7 +572,7 @@ float SFE_ADS122C04::readInternalTemperature(uint8_t rate)
 }
 
 // Configure the input multiplexer
-boolean SFE_ADS122C04::setInputMultiplexer(uint8_t mux_config)
+bool SFE_ADS122C04::setInputMultiplexer(uint8_t mux_config)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_0_REG, &ADS122C04_Reg.reg0.all)) == false)
     return(false);
@@ -563,7 +581,7 @@ boolean SFE_ADS122C04::setInputMultiplexer(uint8_t mux_config)
 }
 
 // Configure the gain
-boolean SFE_ADS122C04::setGain(uint8_t gain_config)
+bool SFE_ADS122C04::setGain(uint8_t gain_config)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_0_REG, &ADS122C04_Reg.reg0.all)) == false)
     return(false);
@@ -572,7 +590,7 @@ boolean SFE_ADS122C04::setGain(uint8_t gain_config)
 }
 
 // Enable/disable the Programmable Gain Amplifier
-boolean SFE_ADS122C04::enablePGA(uint8_t enable)
+bool SFE_ADS122C04::enablePGA(uint8_t enable)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_0_REG, &ADS122C04_Reg.reg0.all)) == false)
     return(false);
@@ -581,7 +599,7 @@ boolean SFE_ADS122C04::enablePGA(uint8_t enable)
 }
 
 // Set the data rate (sample speed)
-boolean SFE_ADS122C04::setDataRate(uint8_t rate)
+bool SFE_ADS122C04::setDataRate(uint8_t rate)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_1_REG, &ADS122C04_Reg.reg1.all)) == false)
     return(false);
@@ -590,7 +608,7 @@ boolean SFE_ADS122C04::setDataRate(uint8_t rate)
 }
 
 // Configure the operating mode (normal / turbo)
-boolean SFE_ADS122C04::setOperatingMode(uint8_t mode)
+bool SFE_ADS122C04::setOperatingMode(uint8_t mode)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_1_REG, &ADS122C04_Reg.reg1.all)) == false)
     return(false);
@@ -599,7 +617,7 @@ boolean SFE_ADS122C04::setOperatingMode(uint8_t mode)
 }
 
 // Configure the conversion mode (single-shot / continuous)
-boolean SFE_ADS122C04::setConversionMode(uint8_t mode)
+bool SFE_ADS122C04::setConversionMode(uint8_t mode)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_1_REG, &ADS122C04_Reg.reg1.all)) == false)
     return(false);
@@ -608,7 +626,7 @@ boolean SFE_ADS122C04::setConversionMode(uint8_t mode)
 }
 
 // Configure the voltage reference
-boolean SFE_ADS122C04::setVoltageReference(uint8_t ref)
+bool SFE_ADS122C04::setVoltageReference(uint8_t ref)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_1_REG, &ADS122C04_Reg.reg1.all)) == false)
     return(false);
@@ -617,7 +635,7 @@ boolean SFE_ADS122C04::setVoltageReference(uint8_t ref)
 }
 
 // Enable / disable the internal temperature sensor
-boolean SFE_ADS122C04::enableInternalTempSensor(uint8_t enable)
+bool SFE_ADS122C04::enableInternalTempSensor(uint8_t enable)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_1_REG, &ADS122C04_Reg.reg1.all)) == false)
     return(false);
@@ -631,7 +649,7 @@ boolean SFE_ADS122C04::enableInternalTempSensor(uint8_t enable)
 }
 
 // Enable / disable the conversion data counter
-boolean SFE_ADS122C04::setDataCounter(uint8_t enable)
+bool SFE_ADS122C04::setDataCounter(uint8_t enable)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_2_REG, &ADS122C04_Reg.reg2.all)) == false)
     return(false);
@@ -640,7 +658,7 @@ boolean SFE_ADS122C04::setDataCounter(uint8_t enable)
 }
 
 // Configure the data integrity check
-boolean SFE_ADS122C04::setDataIntegrityCheck(uint8_t setting)
+bool SFE_ADS122C04::setDataIntegrityCheck(uint8_t setting)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_2_REG, &ADS122C04_Reg.reg2.all)) == false)
     return(false);
@@ -649,7 +667,7 @@ boolean SFE_ADS122C04::setDataIntegrityCheck(uint8_t setting)
 }
 
 // Enable / disable the 10uA burn-out current source
-boolean SFE_ADS122C04::setBurnOutCurrent(uint8_t enable)
+bool SFE_ADS122C04::setBurnOutCurrent(uint8_t enable)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_2_REG, &ADS122C04_Reg.reg2.all)) == false)
     return(false);
@@ -658,7 +676,7 @@ boolean SFE_ADS122C04::setBurnOutCurrent(uint8_t enable)
 }
 
 // Configure the internal programmable current sources
-boolean SFE_ADS122C04::setIDACcurrent(uint8_t current)
+bool SFE_ADS122C04::setIDACcurrent(uint8_t current)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_2_REG, &ADS122C04_Reg.reg2.all)) == false)
     return(false);
@@ -672,7 +690,7 @@ boolean SFE_ADS122C04::setIDACcurrent(uint8_t current)
 }
 
 // Configure the IDAC1 routing
-boolean SFE_ADS122C04::setIDAC1mux(uint8_t setting)
+bool SFE_ADS122C04::setIDAC1mux(uint8_t setting)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_3_REG, &ADS122C04_Reg.reg3.all)) == false)
     return(false);
@@ -681,7 +699,7 @@ boolean SFE_ADS122C04::setIDAC1mux(uint8_t setting)
 }
 
 // Configure the IDAC2 routing
-boolean SFE_ADS122C04::setIDAC2mux(uint8_t setting)
+bool SFE_ADS122C04::setIDAC2mux(uint8_t setting)
 {
   if ((ADS122C04_readReg(ADS122C04_CONFIG_3_REG, &ADS122C04_Reg.reg3.all)) == false)
     return(false);
@@ -691,7 +709,7 @@ boolean SFE_ADS122C04::setIDAC2mux(uint8_t setting)
 
 // Read Config Reg 2 and check the DRDY bit
 // Data is ready when DRDY is high
-boolean SFE_ADS122C04::checkDataReady(void)
+bool SFE_ADS122C04::checkDataReady(void)
 {
   ADS122C04_readReg(ADS122C04_CONFIG_2_REG, &ADS122C04_Reg.reg2.all);
   return(ADS122C04_Reg.reg2.bit.DRDY > 0);
@@ -806,7 +824,7 @@ uint8_t SFE_ADS122C04::getIDAC2mux(void)
 }
 
 // Update ADS122C04_Reg and initialise the ADS122C04 using the supplied parameters
-boolean SFE_ADS122C04::ADS122C04_init(ADS122C04_initParam *param)
+bool SFE_ADS122C04::ADS122C04_init(ADS122C04_initParam *param)
 {
   ADS122C04_Reg.reg0.all = 0; // Reset all four register values to the default value of 0x00
   ADS122C04_Reg.reg1.all = 0;
@@ -831,7 +849,7 @@ boolean SFE_ADS122C04::ADS122C04_init(ADS122C04_initParam *param)
   ADS122C04_Reg.reg3.bit.I1MUX = param->routeIDAC1;
   ADS122C04_Reg.reg3.bit.I2MUX = param->routeIDAC2;
 
-  boolean ret_val = true; // Flag to show if the four writeRegs were successful
+  bool ret_val = true; // Flag to show if the four writeRegs were successful
   // (If any one writeReg returns false, ret_val will be false)
   ret_val &= ADS122C04_writeReg(ADS122C04_CONFIG_0_REG, ADS122C04_Reg.reg0.all);
   ret_val &= ADS122C04_writeReg(ADS122C04_CONFIG_1_REG, ADS122C04_Reg.reg1.all);
@@ -849,7 +867,7 @@ void SFE_ADS122C04::printADS122C04config(void)
 {
   if (_printDebug == true)
   {
-    boolean successful = true; // Flag to show if the four readRegs were successful
+    bool successful = true; // Flag to show if the four readRegs were successful
     // (If any one readReg returns false, success will be false)
     successful &= ADS122C04_readReg(ADS122C04_CONFIG_0_REG, &ADS122C04_Reg.reg0.all);
     successful &= ADS122C04_readReg(ADS122C04_CONFIG_1_REG, &ADS122C04_Reg.reg1.all);
@@ -895,29 +913,29 @@ void SFE_ADS122C04::printADS122C04config(void)
   }
 }
 
-boolean SFE_ADS122C04::reset(void)
+bool SFE_ADS122C04::reset(void)
 {
   return(ADS122C04_sendCommand(ADS122C04_RESET_CMD));
 }
 
-boolean SFE_ADS122C04::start(void)
+bool SFE_ADS122C04::start(void)
 {
   return(ADS122C04_sendCommand(ADS122C04_START_CMD));
 }
 
-boolean SFE_ADS122C04::powerdown(void)
+bool SFE_ADS122C04::powerdown(void)
 {
   return(ADS122C04_sendCommand(ADS122C04_POWERDOWN_CMD));
 }
 
-boolean SFE_ADS122C04::ADS122C04_writeReg(uint8_t reg, uint8_t writeValue)
+bool SFE_ADS122C04::ADS122C04_writeReg(uint8_t reg, uint8_t writeValue)
 {
   uint8_t command = 0;
   command = ADS122C04_WRITE_CMD(reg);
   return(ADS122C04_sendCommandWithValue(command, writeValue));
 }
 
-boolean SFE_ADS122C04::ADS122C04_readReg(uint8_t reg, uint8_t *readValue)
+bool SFE_ADS122C04::ADS122C04_readReg(uint8_t reg, uint8_t *readValue)
 {
   uint8_t command = 0;
   command = ADS122C04_READ_CMD(reg);
@@ -948,14 +966,14 @@ boolean SFE_ADS122C04::ADS122C04_readReg(uint8_t reg, uint8_t *readValue)
   return(false);
 }
 
-boolean SFE_ADS122C04::ADS122C04_sendCommand(uint8_t command)
+bool SFE_ADS122C04::ADS122C04_sendCommand(uint8_t command)
 {
   _i2cPort->beginTransmission((uint8_t)_deviceAddress);
   _i2cPort->write(command);
   return (_i2cPort->endTransmission() == 0);
 }
 
-boolean SFE_ADS122C04::ADS122C04_sendCommandWithValue(uint8_t command, uint8_t value)
+bool SFE_ADS122C04::ADS122C04_sendCommandWithValue(uint8_t command, uint8_t value)
 {
   _i2cPort->beginTransmission((uint8_t)_deviceAddress);
   _i2cPort->write(command);
@@ -968,7 +986,7 @@ boolean SFE_ADS122C04::ADS122C04_sendCommandWithValue(uint8_t command, uint8_t v
 // and is returned in the 24 lowest bits of the uint32_t conversionData.
 // Hence it will always appear positive.
 // Higher functions will need to take care of converting it to (e.g.) float or int32_t.
-boolean SFE_ADS122C04::ADS122C04_getConversionDataWithCount(uint32_t *conversionData, uint8_t *count)
+bool SFE_ADS122C04::ADS122C04_getConversionDataWithCount(uint32_t *conversionData, uint8_t *count)
 {
   uint8_t RXByte[4] = {0};
 
@@ -1033,7 +1051,7 @@ boolean SFE_ADS122C04::ADS122C04_getConversionDataWithCount(uint32_t *conversion
 // and is returned in the 24 lowest bits of the uint32_t conversionData.
 // Hence it will always appear positive.
 // Higher functions will need to take care of converting it to (e.g.) float or int32_t.
-boolean SFE_ADS122C04::ADS122C04_getConversionData(uint32_t *conversionData)
+bool SFE_ADS122C04::ADS122C04_getConversionData(uint32_t *conversionData)
 {
   uint8_t RXByte[3] = {0};
 
